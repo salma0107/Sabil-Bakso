@@ -1,0 +1,261 @@
+<html lang="en">
+
+<head>
+    <!-- <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta nama="viewport" content="width=device-width, initial-scale=1.0"> -->
+    <title>Bakso Landing</title>
+
+    <style>
+        .box {
+            border: 3px solid rgb(247, 238, 238);
+            padding: 20px;
+            margin: auto;
+            width: 60%;
+            justify-content: center;
+            background-color: rgb(240, 240, 240);
+            border-radius: 10px;
+        }
+
+        .p1 {
+            font-family: "Lucida Console", "Courier New", monospace;
+            text-align: center;
+        }
+
+        .p2 {
+            font-family: "Lucida Console", "Courier New", monospace;
+        }
+
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        td,
+        th {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #dddddd;
+        }
+
+        input[type="text"] {
+            width: 48%;
+            /* Menentukan lebar kolom input 100% */
+            padding: 3px;
+            /* Menentukan padding pada kolom input */
+            box-sizing: border-box;
+            /* Menghitung padding dan border sebagai bagian dari lebar */
+        }
+
+        .usia {
+            padding: 3px 20px;
+            width: 10%;
+        }
+
+        .button {
+            cursor: pointer;
+            padding: 1px 10px;
+        }
+
+        .button1 {
+            margin: 4px 2px;
+            cursor: pointer;
+            padding: 3px 20px;
+        }
+
+        .button2 {
+            margin: 4px 2px;
+            cursor: pointer;
+            padding: 3px 20px;
+            /* background-color: red; */
+            color: red;
+        }
+
+        .button3 {
+            margin: 4px 2px;
+            cursor: pointer;
+            padding: 3px 20px;
+            /* background-color: red; */
+            color: green;
+        }
+
+        .poli {
+            padding: 3px 20px;
+        }
+
+        body {
+            background-image: url('https://i.postimg.cc/wMFRxhKq/bakso3.jpg');
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: cover;
+        }
+    </style>
+    <link rel="stylesheet" href="style.css" />
+
+</head>
+
+
+<body>
+    <div style="text-align: center; font-family: cursive;">
+        <br>
+        <h1>APLIKASI BAKSO</h1>
+    </div>
+    <div style="text-align: center;">
+        <p class="p1">
+            <marquee width="60%">Jl. Ir. H. Juanda No.161 Argasari Kota Tasikmalaya, Jawa Barat 46151</marquee>
+        </p>
+    </div>
+
+    <div class="box">
+        <div class="form-container">
+            <p class="p1"><strong>Berikut adalah daftar bakso :</strong></p>
+            <hr />
+            <br>
+            <div id="add-patient-form">
+                <input class="nama" type="text" id="nama" required placeholder="Isi nama disini...">
+                <input class="harga" type="number" id="harga" required placeholder="Isi harga disini...">
+                <input class="qty" type="number" id="qty" required placeholder="Isi Qty disini...">
+                <button class="button1" id="button" onclick="saveData()"><strong>Tambah</strong></button>
+            </div>
+        </div>
+
+        <table id="patient-table" border="1">
+            <thead>
+                <tr style="color: rgba(0, 0, 0, 0.753);">
+                    <th>
+                        <center>No</center>
+                    </th>
+                    <th>
+                        <center>Nama</center>
+                    </th>
+                    <th>
+                        <center>Harga</center>
+                    </th>
+                    <th>
+                        <center>Qty</center>
+                    </th>
+                    <th>
+                        <center>Action</center>
+                    </th>
+                </tr>
+            </thead>
+            <tbody id="result"></tbody>
+        </table>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <script>
+
+        const editData = (id, nama, harga, qty) => {
+            document.getElementById('nama').value = nama;
+            document.getElementById('harga').value = harga;
+            document.getElementById('qty').value = qty;
+            document.getElementById('button').innerText = 'ubah';
+            document.getElementById('button').setAttribute('onclick', `updateData(${id})`);
+
+        }
+
+        const updateData = async (id) => {
+            let nama = document.getElementById('nama').value;
+            let harga = document.getElementById('harga').value;
+            let qty = document.getElementById('qty').value;
+            let text = "Betul data akan diupdate?"
+            if (confirm(text) == true) {
+                await axios.patch(`https://database.politekniklp3i-tasikmalaya.ac.id/api/bakso/${id}`, {
+                    nama: nama,
+                    harga: harga,
+                    qty: qty
+                })
+                    .then((response) => {
+                        getData();
+                        console.log(response);
+                    })
+                    .catch((error) => {
+                        console.log(error.message);
+                    })
+            }
+
+
+        }
+
+        const deleteData = async (id) => {
+            let text = "Betul data akan dihapus?"
+            if (confirm(text) == true) {
+                await axios.delete(`https://database.politekniklp3i-tasikmalaya.ac.id/api/bakso/${id}`)
+                    .then((response) => {
+                        getData();
+                        console.log('berhasil dihapus');
+                    })
+                    .catch((error) => {
+                        console.log(error.message);
+                    });
+            }
+
+
+        }
+
+        const saveData = async () => {
+            let nama = document.getElementById('nama').value;
+            let harga = document.getElementById('harga').value;
+            let qty = document.getElementById('qty').value;
+            await axios.post(`https://database.politekniklp3i-tasikmalaya.ac.id/api/bakso`, {
+                nama: nama,
+                harga: harga,
+                qty: qty
+            })
+                .then((response) => {
+                    getData();
+                    document.getElementById('nama').value = '';
+                    document.getElementById('harga').value = '';
+                    document.getElementById('qty').value = '';
+                    console.log('Berhasil Ditambahkan');
+
+                })
+                .catch((error) => {
+                    console.log(error.message);
+                });
+
+        }
+
+        const getData = async () => {
+            await axios.get(`https://database.politekniklp3i-tasikmalaya.ac.id/api/bakso`)
+                .then((response) => {
+                    let bucket = ``;
+                    let bakso = response.data.baksos;
+                    console.log(bakso);
+
+
+                    for (let i = 0; i < bakso.length; i++) {
+                        bucket += `
+                            <tr>
+                                <td>${i + 1}</td>
+                                <td>${bakso[i].nama}</td>
+                                <td>${bakso[i].harga}</td>
+                                <td>${bakso[i].qty}</td>
+                                <td>
+                                    <button class="edit-btn" onclick="editData('${bakso[i].id}', '${bakso[i].nama}', '${bakso[i].harga}', '${bakso[i].qty}')"><b class="button3" >Edit</b></button>
+                                    <button class="delete-btn" onclick="deleteData(${bakso[i].id})"><b class="button2">Delete</b></button>
+                                </td>
+                            </tr>
+                            `
+                    }
+                    document.getElementById('result').innerHTML = bucket;
+                });
+        }
+        getData();
+    </script>
+
+
+
+
+
+
+</body>
+
+</html>
